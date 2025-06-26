@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <title>অর্থনীতি কুইজ</title>
+  <style>
+    body {
+      font-family: "Kalpurush", "Noto Sans Bengali", sans-serif;
+      background: #f4f4f4;
+      padding: 30px;
+      text-align: center;
+    }
+
+    .quiz-container {
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      max-width: 800px;
+      margin: auto;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      text-align: left;
+    }
+
+    .question {
+      font-size: 18px;
+      margin: 20px 0 10px;
+      font-weight: bold;
+    }
+
+    .options label {
+      display: block;
+      margin: 5px 0;
+      font-size: 16px;
+    }
+
+    .submit-btn {
+      background: #4CAF50;
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      font-size: 18px;
+      border-radius: 8px;
+      cursor: pointer;
+      display: block;
+      margin: 20px auto;
+    }
+
+    #timer {
+      font-size: 18px;
+      color: red;
+      margin: 10px 0;
+      text-align: center;
+    }
+
+    #progressBarContainer {
+      width: 100%;
+      background: #ddd;
+      height: 20px;
+      border-radius: 10px;
+      overflow: hidden;
+      margin-bottom: 20px;
+    }
+
+    #progressBar {
+      height: 100%;
+      background: #4CAF50;
+      width: 100%;
+      transition: width 1s linear;
+    }
+
+    .input-group {
+      margin-bottom: 15px;
+    }
+
+    .input-group label {
+      font-weight: bold;
+      display: block;
+      margin-bottom: 5px;
+    }
+
+    .input-group input {
+      width: 100%;
+      padding: 8px;
+      font-size: 16px;
+    }
+  </style>
+</head>
+<body>
+
+<div id="quizArea" class="quiz-container" style="display:none;">
+  <h2 style="text-align:center;">অর্থনীতি কুইজ</h2>
+
+  <div class="input-group">
+    <label for="username">আপনার নাম:</label>
+    <input type="text" id="username" name="username" required>
+  </div>
+
+  <div class="input-group">
+    <label for="email">আপনার ইমেইল:</label>
+    <input type="email" id="email" name="email" required>
+  </div>
+
+  <div id="timer">
+  <img src="https://img.icons8.com/color/48/000000/stopwatch.png" 
+       alt="stopwatch" style="vertical-align: middle; margin-right: 8px;">
+  <span id="timerText">সময় বাকি: 60 সেকেন্ড</span>
+</div>
+
+  <div id="progressBarContainer">
+    <div id="progressBar"></div>
+  </div>
+
+  <form id="quizForm">
+    <div class="question">1. GNP-এর পরিমাপে নিচের কোনটি যুক্ত হয়?</div>
+    <div class="options">
+      <label><input type="radio" name="q1" value="a"> a) সরকারী খরচ</label>
+      <label><input type="radio" name="q1" value="b"> b) কর</label>
+      <label><input type="radio" name="q1" value="c"> c) বিদেশ থেকে প্রাপ্ত নিট আয়</label>
+      <label><input type="radio" name="q1" value="d"> d) অবচয়</label>
+    </div>
+
+    <div class="question">2. NNP নির্ণয়ের সূত্র কোনটি?</div>
+    <div class="options">
+      <label><input type="radio" name="q2" value="a"> a) GNP + Depreciation</label>
+      <label><input type="radio" name="q2" value="b"> b) GNP - Depreciation</label>
+      <label><input type="radio" name="q2" value="c"> c) GDP - Subsidy</label>
+      <label><input type="radio" name="q2" value="d"> d) GDP + Net income</label>
+    </div>
+
+    <div class="question">3. কোনটি Nominal GDP-এর বৈশিষ্ট্য?</div>
+    <div class="options">
+      <label><input type="radio" name="q3" value="a"> a) এটি বর্তমান মূল্যে হিসাব করা হয়</label>
+      <label><input type="radio" name="q3" value="b"> b) এটি নির্দিষ্ট মূল্যে হিসাব করা হয়</label>
+      <label><input type="radio" name="q3" value="c"> c) এটি প্রকৃত উৎপাদন নির্দেশ করে</label>
+      <label><input type="radio" name="q3" value="d"> d) এটি উৎপাদনের পরিমাণ নির্দেশ করে না</label>
+    </div>
+
+    <button type="submit" class="submit-btn">জমা দিন</button>
+  </form>
+</div>
+
+<div id="thankYou" style="display:none;">
+  <h2>ধন্যবাদ! আপনি ইতিমধ্যেই কুইজটি সম্পন্ন করেছেন।</h2>
+</div>
+
+<script>
+  const answers = { q1: "c", q2: "b", q3: "a" };
+  const timeLimit = 60; // seconds
+  let timeLeft = timeLimit;
+  let countdown;
+  const form = document.getElementById("quizForm");
+  const timerDisplay = document.getElementById("timer");
+  const quizArea = document.getElementById("quizArea");
+  const thankYou = document.getElementById("thankYou");
+  const progressBar = document.getElementById("progressBar");
+
+  // If user has already completed quiz
+  if (localStorage.getItem("quizDone")) {
+    thankYou.style.display = "block";
+  } else {
+    quizArea.style.display = "block";
+    startTimer();
+  }
+
+  function startTimer() {
+    countdown = setInterval(() => {
+      timeLeft--;
+      document.getElementById("timerText").textContent = "সময় বাকি: " + timeLeft + " সেকেন্ড";
+
+
+      let percent = (timeLeft / timeLimit) * 100;
+      progressBar.style.width = percent + "%";
+
+      if (timeLeft <= 0) {
+        clearInterval(countdown);
+        form.requestSubmit();
+      }
+    }, 1000);
+  }
+
+  form.addEventListener("submit", function(e) {
+    e.preventDefault();
+    clearInterval(countdown);
+
+    const username = document.getElementById("username").value.trim();
+    const email = document.getElementById("email").value.trim();
+
+    if (!username || !email) {
+      alert("অনুগ্রহ করে আপনার নাম এবং ইমেইল প্রদান করুন।");
+      return;
+    }
+
+    let score = 0;
+    let total = Object.keys(answers).length;
+
+    for (let q in answers) {
+      const selected = form[q].value;
+      if (selected === answers[q]) score++;
+    }
+
+    alert(username + ", আপনার স্কোর: " + score + " / " + total);
+
+    // Send to Google Sheets
+    fetch("YOUR_GOOGLE_SCRIPT_WEBAPP_URL", {
+      method: "POST",
+      body: JSON.stringify({
+        name: username,
+        email: email,
+        score: score,
+        q1: form.q1.value,
+        q2: form.q2.value,
+        q3: form.q3.value
+      }),
+      headers: { "Content-Type": "application/json" }
+    });
+
+    // Block repeated attempt
+    localStorage.setItem("quizDone", "true");
+    quizArea.style.display = "none";
+    thankYou.style.display = "block";
+  });
+</script>
+
+</body>
+</html>
