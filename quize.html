@@ -201,15 +201,12 @@
     alert(username + ", আপনার স্কোর: " + score + " / " + total);
 
     // Send to Google Sheets
-    fetch("YOUR_GOOGLE_SCRIPT_WEBAPP_URL", {
+    fetch("https://script.google.com/macros/s/AKfycbwwbeBWiQJHsIUyIqjOK_Swu48OIAjjp1hCYh7_zw7f33dI2g52RfKh3ufJTFcNNlTDrg/exec", {
       method: "POST",
       body: JSON.stringify({
         name: username,
         email: email,
-        score: score,
-        q1: form.q1.value,
-        q2: form.q2.value,
-        q3: form.q3.value
+        score: score
       }),
       headers: { "Content-Type": "application/json" }
     });
